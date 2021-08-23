@@ -15,8 +15,7 @@ example (u v : ℕ → ℝ) (a b : ℝ) (hu : seq_limit u a) (hv : seq_limit v b
   seq_limit (u + v) (a + b) 
   :=
 begin
-  intro ε,
-  intro epp,
+  intros ε epp,
   have ephp : ε/2 > 0,
     linarith,
   specialize hu (ε/2) ephp,
@@ -66,7 +65,7 @@ end
 -- If [`u` approches `l`] and [`v` approches `l`], then [`w` such that `u ≤ w ≤ v` approaches `l` as well].
 example (u v w : ℕ → ℝ) (l : ℝ) (hu : seq_limit u l) (hv : seq_limit v l)
         (below : ∀ n, u n ≤ w n) (above : ∀ n, w n ≤ v n) :
-  seq_limit v l 
+  seq_limit w l 
   :=
 begin
   intros ε epp,
