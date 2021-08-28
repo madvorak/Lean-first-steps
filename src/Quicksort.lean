@@ -17,8 +17,6 @@ begin
     linarith,
 
     unfold list.sizeof,
-    have siz : (pivot :: tail).sizeof = (1 + (sizeof pivot) + tail.sizeof),
-      unfold list.sizeof,
     by_cases cond head pivot,
 
       -- here `cond` holds
@@ -34,7 +32,7 @@ begin
            = (head :: only_those cond pivot tail).sizeof             : by rw unwrap_yes
       ...  = 1 + (sizeof head) + (only_those cond pivot tail).sizeof : by unfold list.sizeof
       ...  < 1 + (sizeof head) + (pivot :: tail).sizeof              : by linarith  -- uses `ih` and `add_le_add` afaik
-      ...  = 1 + (sizeof head) + (1 + (sizeof pivot) + tail.sizeof)  : by linarith, -- uses `siz`
+      ...  = 1 + (sizeof head) + (1 + (sizeof pivot) + tail.sizeof)  : by unfold list.sizeof,
       
       -- here `cond` does not hold
       have unwrap_no : only_those cond pivot (head :: tail) = only_those cond pivot tail,
@@ -48,7 +46,7 @@ begin
       calc (only_those cond pivot (head :: tail)).sizeof 
            = (only_those cond pivot tail).sizeof                    : by rw unwrap_no
       ...  < (pivot :: tail).sizeof                                 : ih
-      ...  =                     (1 + (sizeof pivot) + tail.sizeof) : siz
+      ...  =                     (1 + (sizeof pivot) + tail.sizeof) : by unfold list.sizeof
       ...  ≤ 1 + (sizeof head) + (1 + (sizeof pivot) + tail.sizeof) : le_add_self
 end
 

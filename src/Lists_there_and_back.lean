@@ -1,6 +1,7 @@
 import tactic
 
 
+
 def reversed {α : Type} : list α → list α
 | []        := []
 | (x :: xs) := (reversed xs) ++ [x]
