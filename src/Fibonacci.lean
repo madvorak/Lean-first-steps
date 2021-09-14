@@ -1,6 +1,5 @@
 import data.nat.basic
 import tactic
-import Complete_induction
 
 
 def fibo : ℕ → ℕ
@@ -23,52 +22,19 @@ def fibo_fast : ℕ → ℕ
 
 
 
-private lemma fibo_ff_aux : ∀ n : ℕ, (ff n) = (fibo n, fibo n.succ)
+private lemma fibo_ff_aux (n : ℕ) : (ff n) = (fibo n, fibo n.succ)
   :=
 begin
-  apply induction_complete,
-  intro n,
-  by_cases n < 2,
-    intro _,
-    by_cases n = 0,
+  induction n with n ih,
+    refl,
 
-      -- case n = 0
-      rw h,
-      refl,
-
-      -- case n = 1
-      have n_eq_1: n = 1, 
-        omega,
-      rw n_eq_1,
-      refl,
-
-    -- case n ≥ 2
-    push_neg at h,
-    intro ass,
-    have n_as_succ_succ: ∃ m : ℕ, n = m.succ.succ,
-    {
-      use n - 2,
-      omega,
-    },
-    cases n_as_succ_succ with m rel,
-    rw rel,
     unfold fibo,
-    have unfolding_ff: (ff m.succ.succ) = ((ff m.succ).2, (ff m.succ).1 + (ff m.succ).2),
+    have unfolding_ff: (ff n.succ) = ((ff n).2, (ff n).1 + (ff n).2),
       refl,
     rw unfolding_ff,
-
-    have m_succ_le_n: m.succ < n,
-      rw rel,
-      exact lt_add_one m.succ,
-    have h₁ := ass m.succ m_succ_le_n,
-
-    rw h₁,
+    rw ih,
     simp,
-    split,
-      refl,
-
-      unfold fibo,
-      rw add_comm,
+    apply add_comm,
 end
 
 
