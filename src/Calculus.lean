@@ -23,22 +23,23 @@ begin
   use (ε / 3),
   intro epp,
   split,
+  {
     linarith,
-
-    intro a,
-    intro assumptions,
-    cases assumptions with un important,
-    have absol₃ : abs (3 : ℝ) = (3 : ℝ),
-    {
-      rw abs,
-      simp,
-      linarith,
-    },
-    calc abs (30 - 3 * a) = abs (3 * (10 - a))     : by ring_nf
-    ...                   = (abs 3) * abs (10 - a) : by rw abs_mul
-    ...                   = 3 * abs (10 - a)       : by rw absol₃
-    ...                   < 3 * ε / 3              : by linarith
-    ...                   = ε                      : by ring
+  },
+  intro a,
+  intro assumptions,
+  cases assumptions with un important,
+  have absol₃ : abs (3 : ℝ) = (3 : ℝ),
+  {
+    rw abs,
+    simp,
+    linarith,
+  },
+  calc abs (30 - 3 * a) = abs (3 * (10 - a))     : by ring_nf
+  ...                   = (abs 3) * abs (10 - a) : by rw abs_mul
+  ...                   = 3 * abs (10 - a)       : by rw absol₃
+  ...                   < 3 * ε / 3              : by linarith
+  ...                   = ε                      : by ring
 end
 
 example : has_derivative_exactly (λ x, x*x) 100 200 :=
@@ -47,32 +48,32 @@ begin
   unfold has_limit_exactly,
   intro ε,
   use ε,
-  --use (ε / 999),
   intro epp,
   split,
-    linarith,
-
-    intro h,
-    intro assum,
-    cases assum with h_not_zero h_near_zero,
-    have absm_h_small : abs (- h) < ε,
-    {
-      rw zero_sub at h_near_zero,
-      exact h_near_zero,
-    },
-    have crap : h = 0 → 200 + h = 0, 
-    {
-      contrapose!,
-      intro foo,
-      exact h_not_zero,
-    },
-    calc abs (200 - ((100 + h) * (100 + h) - 100 * 100) / h) 
-         = abs (200 - (100 * 100 + 200 * h + h * h - 100 * 100) / h) : by ring_nf
-    ...  = abs (200 - (200 * h + h * h) / h)                         : by ring_nf
-    ...  = abs (200 - (h * (200 + h)) / h)                           : by ring_nf
-    ...  = abs (200 - (200 + h))                                     : by rw mul_div_cancel_left_of_imp crap
-    ...  = abs (- h)                                                 : by ring_nf
-    ...  < ε                                                         : absm_h_small,
+  {
+    exact epp,
+  },
+  intro h,
+  intro assum,
+  cases assum with h_not_zero h_near_zero,
+  have absm_h_small : abs (- h) < ε,
+  {
+    rw zero_sub at h_near_zero,
+    exact h_near_zero,
+  },
+  have crap : h = 0 → 200 + h = 0, 
+  {
+    contrapose!,
+    intro foo,
+    exact h_not_zero,
+  },
+  calc abs (200 - ((100 + h) * (100 + h) - 100 * 100) / h) 
+       = abs (200 - (100 * 100 + 200 * h + h * h - 100 * 100) / h) : by ring_nf
+  ...  = abs (200 - (200 * h + h * h) / h)                         : by ring_nf
+  ...  = abs (200 - (h * (200 + h)) / h)                           : by ring_nf
+  ...  = abs (200 - (200 + h))                                     : by rw mul_div_cancel_left_of_imp crap
+  ...  = abs (- h)                                                 : by ring_nf
+  ...  < ε                                                         : absm_h_small,
 end
 
 example (k q : ℝ) : is_continuous_function (λ x : ℝ, k*x + q) :=
@@ -82,15 +83,21 @@ begin
   use (ε / (1 + abs k)),
   intro epp,
   split,
+  {
+    have abs_k_ge_0 := abs_nonneg k,
+    have bracket_ge_0 : (1 + abs k) ≥ 0, 
+    {
+      linarith,
+    },
     sorry,
-    
-    intro a,
-    intro assumts,
-    cases assumts with a_not_x a_near_x,
-    ring_nf,
-    ring_nf,
-    calc abs ((x - a) * k) = abs (x - a) * abs k           : by rw abs_mul
-    ...                    < abs k * ε / (1 + abs k)       : by sorry
-    ...                    ≤ (1 + abs k) * ε / (1 + abs k) : by sorry
-    ...                    = ε                             : by rw mul_div_cancel_left_of_imp sorry,
+  },    
+  intro a,
+  intro assumts,
+  cases assumts with a_not_x a_near_x,
+  ring_nf,
+  ring_nf,
+  calc abs ((x - a) * k) = abs (x - a) * abs k           : by rw abs_mul
+  ...                    < abs k * ε / (1 + abs k)       : by sorry
+  ...                    ≤ (1 + abs k) * ε / (1 + abs k) : by sorry
+  ...                    = ε                             : by rw mul_div_cancel_left_of_imp sorry,
 end

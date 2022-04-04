@@ -23,10 +23,8 @@ begin
 
   cases hu with Nᵤ limit_u,
   cases hv with Nᵥ limit_v,
-  have prop_u : max Nᵤ Nᵥ ≥ Nᵤ,
-   exact le_max_left Nᵤ Nᵥ,
-  have prop_v : max Nᵤ Nᵥ ≥ Nᵥ,
-   exact le_max_right Nᵤ Nᵥ,
+  have prop_u : max Nᵤ Nᵥ ≥ Nᵤ := le_max_left  Nᵤ Nᵥ,
+  have prop_v : max Nᵤ Nᵥ ≥ Nᵥ := le_max_right Nᵤ Nᵥ,
 
   use max Nᵤ Nᵥ,
   intro n,

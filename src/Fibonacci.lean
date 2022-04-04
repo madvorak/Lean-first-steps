@@ -7,7 +7,7 @@ def fibo : ℕ → ℕ
 | 1 := 1
 | (n+2) := (fibo (n+1)) + (fibo n)
 
-#eval fibo 33
+#eval fibo 5
 
 
 def ff : ℕ → (ℕ × ℕ)
@@ -18,7 +18,7 @@ def fibo_fast : ℕ → ℕ
 | 0 := 0
 | (n+1) := (ff n).2
 
-#eval fibo_fast 33
+#eval fibo_fast 5
 
 
 
