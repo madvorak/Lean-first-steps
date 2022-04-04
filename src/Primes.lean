@@ -4,43 +4,28 @@ import data.set.finite
 
 open nat
 
-/-
-@[derive decidable]
-def is_prime (n : ℕ) : Prop :=
-∀ a : ℕ, ((1 < a) ∧ (a < n)) → (a ∣ n)
--/
-
-/-def generate_primes_under : ℕ → list ℕ
+private def generate_naturals_satisfying_down (pred : ℕ → Prop) [decidable_pred pred] : ℕ → list ℕ
 | 0     := []
-| (n+1) := (generate_primes_under (n)) ++ (if nat.prime n then [n] else [])
+| (n+1) := if pred n
+           then n :: generate_naturals_satisfying_down n
+           else      generate_naturals_satisfying_down n
 
-#eval generate_primes_under 12345-/
-
-/-def generate_primes_from_a_to_b (a b : ℕ) : list ℕ :=
-if a > b then [] else (
-  if nat.prime a then a :: (generate_primes_from_a_to_b (a+1) b)
-  else (generate_primes_from_a_to_b (a+1) b)
-)-/
-
-private def generate_primes_down : ℕ → list ℕ
-| 0     := []
-| (n+1) := if nat.prime n then n :: (generate_primes_down (n))
-                          else      (generate_primes_down (n))
+def generate_naturals_satisfying_under (pred : ℕ → Prop) [decidable_pred pred] (z : ℕ) : list ℕ :=
+list.reverse (generate_naturals_satisfying_down pred z)
 
 def generate_primes_under (z : ℕ) : list ℕ :=
-list.reverse (generate_primes_down z)
+generate_naturals_satisfying_under nat.prime z
 
-#eval generate_primes_under 20
+#eval generate_primes_under 40
 
-
-theorem generated_primes_under (z : ℕ) :
-  ∀ n : ℕ,  n ∈ generate_primes_under z  ↔  n < z  ∧  nat.prime n  :=
+lemma generated_exactly_naturals_satisfying_under (pred : ℕ → Prop) [decidable_pred pred] (z : ℕ) :
+  ∀ n : ℕ,  n ∈ generate_naturals_satisfying_under pred z  ↔  n < z  ∧  pred n  :=
 begin
-  unfold generate_primes_under,
+  unfold generate_naturals_satisfying_under,
   induction z with y ih,
   {
     intro n,
-    unfold generate_primes_down,
+    unfold generate_naturals_satisfying_down,
     simp,
   },
   intro n,
@@ -49,12 +34,12 @@ begin
   split,
   {
     intro ass,
-    unfold generate_primes_down at ass,
+    unfold generate_naturals_satisfying_down at ass,
     by_cases n = y,
     {
       rename h n_eq_y,
       rw n_eq_y at *,
-      have y_not_in : y ∉ generate_primes_down y,
+      have y_not_in : y ∉ generate_naturals_satisfying_down pred y,
       {
         by_contradiction,
         have hyp := (ih.1 h).left,
@@ -77,7 +62,7 @@ begin
     },
     {
       rename h n_neq_y,
-      have n_in : n ∈ generate_primes_down y,
+      have n_in : n ∈ generate_naturals_satisfying_down pred y,
       {
         split_ifs at ass,
         {
@@ -110,7 +95,7 @@ begin
     {
       rename h n_lt_y,
       have hyp := ih.2 (and.intro n_lt_y n_prime),
-      unfold generate_primes_down,
+      unfold generate_naturals_satisfying_down,
       split_ifs,
       {
         exact list.mem_cons_of_mem y hyp,
@@ -123,64 +108,97 @@ begin
       have n_eq_y := nat.eq_of_lt_succ_of_not_lt n_small h,
       clear h,
       rw n_eq_y at *,
-      unfold generate_primes_down,
+      unfold generate_naturals_satisfying_down,
       split_ifs,
       exact list.mem_cons_self y _,
     }
   },
 end
 
+theorem generated_exactly_primes_under (z : ℕ) :
+  ∀ n : ℕ,  n ∈ generate_primes_under z  ↔  n < z  ∧  nat.prime n  :=
+generated_exactly_naturals_satisfying_under nat.prime z
 
-/-private def is_prime_aux (n d : ℕ) : bool :=
-if d * d ≥ n then tt
-else if d ∣ n then ff
-     else is_prime_aux n (d + 1)-/
 
-private def is_prime_aux (n : ℕ) : ℕ → bool
+private def is_prime_aux (n : ℕ) (k : ℕ) : ℕ → bool
 | zero     := tt
-| (succ d) := if d = 1 
-              then tt
-              else if d ∣ n 
-                   then ff
-                   else is_prime_aux d
+| (succ d) := if (k - d) ∣ n
+              then ff
+              else is_prime_aux d
 
+-- It is not really fast, but why?
 def is_prime_fast (n : ℕ) : bool :=
 if n > 1
-then is_prime_aux n (nat.sqrt n + 1)
+then is_prime_aux n (nat.sqrt n) (nat.sqrt n - 1)
 else ff
 
--- TODO in order to be really fast, test potential divisors from 2 up (not down)
-private def generate_primes_down_fast : ℕ → list ℕ
-| 0     := []
-| (n+1) := if is_prime_fast n 
-           then n :: (generate_primes_down_fast (n))
-           else      (generate_primes_down_fast (n))
-
 def generate_primes_under_fast (z : ℕ) : list ℕ :=
-list.reverse (generate_primes_down_fast z)
+generate_naturals_satisfying_under (λ x, is_prime_fast x) z
 
-#eval generate_primes_under_fast 20
+#eval generate_primes_under_fast 40
 
-#eval list.length $ generate_primes_under 10000
-#eval list.length $ generate_primes_under_fast 10000
+#eval list.length $ generate_primes_under 100000
+#eval list.length $ generate_primes_under_fast 100000
+
+lemma equivalent_defs_primes : ↑is_prime_fast = nat.prime :=
+begin
+  ext1,
+  norm_num,
+  split,
+  {
+    sorry,
+  },
+  {
+    unfold_coes,
+    unfold is_prime_fast,
+    intro ass,
+    simp,
+    split,
+    {
+      exact prime.one_lt ass,
+    },
+    have indu : ∀ k : ℕ, is_prime_aux x (sqrt x) k = tt,
+    {
+      intro k,
+      induction k with m ih;
+      unfold is_prime_aux,
+      split_ifs,
+      {
+        have hope_contra := ass.right (sqrt x - m) h,
+        cases hope_contra,
+        {
+          sorry,
+        },
+        {
+          sorry,
+        },
+      },
+      {
+        exact ih,
+      }
+    },
+    exact indu (sqrt x - 1),
+  },
+end
+
+theorem generated_exactly_primes_under_fast (z : ℕ) :
+  ∀ n : ℕ,  n ∈ generate_primes_under_fast z  ↔  n < z  ∧  nat.prime n  :=
+begin
+  intro n,
+  unfold generate_primes_under_fast,
+  unfold_coes,
+  convert generated_exactly_naturals_satisfying_under (λ (x : ℕ), is_prime_fast x = tt) z n,
+  exact (congr_fun equivalent_defs_primes n).symm,
+end
 
 
-theorem infinitely_many_primes :
+lemma always_higher_prime :
   ∀ z : ℕ, ∃ p : ℕ,  p > z  ∧  nat.prime p  :=
 begin
   intro z,
   by_contradiction contra,
   push_neg at contra,
   let x := z.factorial + 1,
-  /-by_cases nat.prime x,
-  {
-    have x_gt_z : x > z,
-    {
-      have big_fak := nat.self_le_factorial z,
-      linarith,
-    },
-    exact contra x x_gt_z h,
-  },-/
 
   have two_le_x : 2 ≤ x,
   {
@@ -216,4 +234,13 @@ begin
     rw nat.dvd_one at dvd_difference,
     exact prime.ne_one prime_q dvd_difference,
   },
+end
+
+theorem infinite_set_of_primes : set.infinite nat.prime :=
+begin
+  intro finit,
+  unfold set.finite at finit,
+  cases finit,
+  let all_primes := finit.elems.val,
+  sorry,
 end
