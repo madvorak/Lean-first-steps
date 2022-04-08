@@ -1,6 +1,8 @@
 import tactic
 import field_theory.finite.basic
 
+open_locale nat
+
 
 structure public_key :=
 (n : ℕ)
@@ -57,55 +59,20 @@ begin
   unfold decrypt,
   unfold encrypt,
   norm_num,
-  have mpm := mod_pow_mod (↑m ^ key_pair.pub.e) key_pair.pub.n key_pair.d,
-  /-
-  convert_to @fin.mk (key_pair.pub.n)
-          ((↑m ^ key_pair.pub.e) ^ ↑key_pair.d % key_pair.pub.n)
-          (nat.mod_lt _ key_pair.pub.n_pos)
-          = m,
-  {
-    convert mpm;
-    sorry,
-  },
-  rw ← pow_mul,
-  sorry,
-  -/
-  sorry,
-end
-
+  have mpm := mod_pow_mod (m ^ key_pair.pub.e) key_pair.pub.n key_pair.d,
 /-
-def encrypt' (key : public_key) (message : ℤ) : ℤ :=
-message ^ key.e % key.n
-
-def decrypt' (key : full_key) (message : ℤ) : ℤ :=
-message ^ key.d % key.pub.n
-
-open_locale nat
-
-theorem RSA_works' (key_pair : full_key) :
-  ∀ message : ℕ,  0 ≤ message  →  message < key_pair.pub.n  →
-    decrypt' key_pair (encrypt' key_pair.pub message) = message :=
-begin
-  intros m non_neg non_over,
-  unfold decrypt',
-  unfold encrypt',
-  rw mod_pow_mod,
-  rw ← pow_mul,
-  have cheaty : (key_pair.pub.e * key_pair.d) % (φ ↑key_pair.pub.n) = 1, sorry,
-  have kopr : m.coprime ↑key_pair.pub.n, sorry,
-  have fermat := nat.modeq.pow_totient kopr,
-  rw unmodulo at cheaty,
-  have cheaty' : 
-    key_pair.pub.e * key_pair.d = 
-    1 + ↑(key_pair.pub.n).totient * (key_pair.pub.e * key_pair.d / ↑(key_pair.pub.n).totient),
+  have maybe_can : (↑m ^ key_pair.pub.e % ↑key_pair.pub.n) ^ key_pair.d % ↑key_pair.pub.n = ↑m,
   {
-    -- ??? follows from `cheaty` ???
+    rw mpm,
+    rw ← pow_mul,
+    have cheaty : (key_pair.pub.e * key_pair.d) % (φ ↑key_pair.pub.n) = 1, sorry,
+    have fermat := nat.modeq.pow_totient sorry;
+    sorry,
+  }, swap, exact coe_to_lift,
+-/
+  have cannot : (↑m ^ key_pair.pub.e % key_pair.pub.n) ^ key_pair.d % key_pair.pub.n = ↑m,
+  {
     sorry,
   },
-  rw cheaty',
-  rw pow_add,
-  rw pow_mul,
-  --rw fermat,
-  sorry,
+  finish, -- uncommenting `maybe_can` above breaks this `finish` and I have no idea why
 end
--/
