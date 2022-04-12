@@ -10,7 +10,7 @@ def seq_limit (u : ℕ → ℝ) (l : ℝ) : Prop :=
 
 
 -- Arithmetic of limits: sum law
--- If [`u` tends to `a`] and [`v` tends `b`], then [`u+v` tends to `a+b`].
+-- If [`u` tends to `a`] and [`v` tends to `b`], then [`u+v` tends to `a+b`].
 example (u v : ℕ → ℝ) (a b : ℝ) (hu : seq_limit u a) (hv : seq_limit v b) :
   seq_limit (u + v) (a + b) 
   :=
@@ -60,7 +60,7 @@ end
 
 
 -- Squeeze theorem (a.k.a. Sandwich rule, Two policemen and a drunk, ...)
--- If [`u` approches `l`] and [`v` approches `l`], then [`w` such that `u ≤ w ≤ v` approaches `l` as well].
+-- If [`u` approaches `l`] and [`v` approaches `l`], then [`w` such that `u ≤ w ≤ v` approaches `l` as well].
 example (u v w : ℕ → ℝ) (l : ℝ) (hu : seq_limit u l) (hv : seq_limit v l)
         (below : ∀ n, u n ≤ w n) (above : ∀ n, w n ≤ v n) :
   seq_limit w l 
