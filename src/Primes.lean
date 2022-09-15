@@ -140,6 +140,9 @@ generate_naturals_satisfying_under (λ x, is_prime_fast x) z
 #eval list.length $ generate_primes_under 100000
 #eval list.length $ generate_primes_under_fast 100000
 
+/-
+The remaining part of this file doesn't work with the updated mathlib.
+
 lemma equivalent_defs_primes : ↑is_prime_fast = nat.prime :=
 begin
   ext1,
@@ -244,3 +247,4 @@ begin
   let all_primes := finit.elems.val,
   sorry,
 end
+-/

@@ -1,4 +1,4 @@
-import algebra.order
+import algebra.order.group
 import tactic
 
 
