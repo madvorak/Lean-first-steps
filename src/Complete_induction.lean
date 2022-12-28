@@ -3,8 +3,7 @@ open nat
 
 
 private lemma induction_strong_version (P : ℕ → Prop) (n : ℕ) : 
-  (∀ x : ℕ, (∀ y : ℕ, y < x → (P y)) → (P x))  →  (∀ z : ℕ, z < n → (P z)) 
-  :=
+  (∀ x : ℕ, (∀ y : ℕ, y < x → (P y)) → (P x))  →  (∀ z : ℕ, z < n → (P z))  :=
 begin
   intro ass,
   induction n with m ih,
@@ -30,8 +29,7 @@ end
 
 
 theorem induction_complete (P : ℕ → Prop) : 
-  (∀ x : ℕ, (∀ y : ℕ, y < x → (P y)) → (P x))  →  (∀ n : ℕ, P n) 
-  :=
+  (∀ x : ℕ, (∀ y : ℕ, y < x → (P y)) → (P x))  →  (∀ n : ℕ, P n)  :=
 begin
   intro assum,
   intro n,

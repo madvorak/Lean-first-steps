@@ -8,8 +8,7 @@ private def only_those {T : Type} (cond : T → T → Prop) [∀ n, ∀ m, decid
 | p (x :: xs) := if (cond x p) then x :: only_those p xs else only_those p xs
 
 private lemma size_cap {T : Type} {cond : T → T → Prop} [∀ n, ∀ m, decidable (cond n m)] {pivot : T} {lizt : list T} :
-  (only_those cond pivot lizt).sizeof < (pivot :: lizt).sizeof
-  :=
+  (only_those cond pivot lizt).sizeof < (pivot :: lizt).sizeof  :=
 begin
   induction lizt with head tail ih,
     unfold only_those,
